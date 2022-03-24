@@ -23,14 +23,15 @@ io.on("connection", (socket) => {
     io.to(room).emit('get_messages', chats.map(chat => chat.room === room))
   })
 
-  socket.on("join_room", (data) => {
-    socket.join(data);
-    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  socket.on("join_room", (userId) => {
+    socket.join(userId);
+    console.log(`User with ID: ${socket.id} joined room: ${userId}`);
   });
 
   socket.on("message", (data) => {
     chats.push(data)
-    io.to(data.room).emit("message", data);
+    io.to(data.from).emit("message", data);
+    io.to(data.to).emit("message", data);
   });
 
   socket.on("disconnect", () => {

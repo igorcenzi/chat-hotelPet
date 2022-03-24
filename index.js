@@ -5,6 +5,8 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 app.use(cors());
 
+const chats = []
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -17,12 +19,17 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
+  socket.on('get_messages', (room) => {
+    io.to(room).emit('get_messages', chats.map(chat => chat.room === room))
+  })
+
   socket.on("join_room", (data) => {
     socket.join(data);
     console.log(`User with ID: ${socket.id} joined room: ${data}`);
   });
 
   socket.on("message", (data) => {
+    chats.push(data)
     io.to(data.room).emit("message", data);
   });
 

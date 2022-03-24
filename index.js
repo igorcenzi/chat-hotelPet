@@ -19,8 +19,8 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
-  socket.on('get_messages', (room) => {
-    io.to(room).emit('get_messages', chats.map(chat => chat.room === room))
+  socket.on('get_messages', (userId) => {
+    io.to(room).emit('get_messages', chats.map(chat => chat.room === userId))
   })
 
   socket.on("join_room", (userId) => {
@@ -30,8 +30,8 @@ io.on("connection", (socket) => {
 
   socket.on("message", (data) => {
     chats.push(data)
-    io.to(data.from).emit("message", data);
-    io.to(data.to).emit("message", data);
+    io.to(data.from).to(data.to).emit("message", data);
+
   });
 
   socket.on("disconnect", () => {
